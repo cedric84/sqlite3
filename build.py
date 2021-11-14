@@ -117,6 +117,35 @@ class host_clg_macos_t(host_t):
 			self.install()
 			self.clean()
 
+class host_clg_freebsd64_t(host_t):
+	def __del__(self):
+		"""The destructor."""
+		pass
+
+	def __init__(self, user_args):
+		"""The main constructor."""
+		#---Call parent constructor---#
+		super().__init__(user_args)
+
+	def build_all(self):
+		"""Builds all the supported targets."""
+		configure_arg_arr	= [
+			[
+				"x86_64-freebsd",
+				"--with-pic=yes",
+				"CFLAGS=-Wall -Werror",
+				"LDFLAGS=-Wl,-rpath,\\$$ORIGIN/../lib",
+				"LIBS=-lm",
+			],
+		]
+		for configure_idx in range(0, len(configure_arg_arr)):
+			configure_arg	= configure_arg_arr[configure_idx]
+			self.autoreconf()
+			self.configure(*configure_arg)
+			self.make()
+			self.install()
+			self.clean()
+
 class host_github_linux_t(host_clg_pandeb9_t):
 	def __del__(self):
 		"""The destructor."""
@@ -145,6 +174,7 @@ class host_github_macos_t(host_clg_macos_t):
 host_names	= {
 	"clg-pandeb9"	: host_clg_pandeb9_t,
 	"clg-macos"		: host_clg_macos_t,
+	"clg-freebsd64"	: host_clg_freebsd64_t,
 	"github-linux"	: host_github_linux_t,
 	"github-macos"	: host_github_macos_t,
 }
