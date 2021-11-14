@@ -73,7 +73,7 @@ class host_clg_pandeb9_t(host_t):
 			[
 				"i686-mingw",
 				"--host=i686-w64-mingw32",
-				"CC=i686-w64-mingw32-gcc",
+				"CC=i686-w64-mingw32-gcc -static-libgcc",
 				"CFLAGS=-Wall -Werror",
 			],
 			[
