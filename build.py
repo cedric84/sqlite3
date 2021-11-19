@@ -3,6 +3,7 @@ import pathlib
 import os
 import subprocess
 import sys
+import shutil
 
 def run(*args):
 	"""Runs the specified command."""
@@ -146,6 +147,59 @@ class host_clg_freebsd64_t(host_t):
 			self.install()
 			self.clean()
 
+class host_clg_junior_t(host_t):
+	def __del__(self):
+		"""The destructor."""
+		pass
+
+	def __init__(self, user_args):
+		"""The main constructor."""
+		#---Call parent constructor---#
+		super().__init__(user_args)
+
+	def build_all(self):
+		"""Builds all the supported targets."""
+		# see https://sqlite.org/howtocompile.html
+		configure_arg_arr	= [
+			[
+				"i686-mingw",
+				str(pathlib.Path(os.environ["MINGW_HOME32"], "bin", "gcc.exe")),
+			],
+		]
+		for configure_idx in range(0, len(configure_arg_arr)):
+			#---Definitions---#
+			triplet			= configure_arg_arr[configure_idx][0]
+			CC				= configure_arg_arr[configure_idx][1]
+			include_path	= self.install_pfx.joinpath(triplet, "include")
+			bin_path		= self.install_pfx.joinpath(triplet, "bin")
+			lib_path		= self.install_pfx.joinpath(triplet, "lib")
+
+			#---Create directories---#
+			os.makedirs(str(include_path), exist_ok=not False)
+			os.makedirs(str(bin_path), exist_ok=not False)
+			os.makedirs(str(lib_path), exist_ok=not False)
+
+			#---Compile---#
+			run(CC,
+				"-static-libgcc",
+				"-Wall",
+				"-Werror",
+				"-shared",
+				"-Wl,--out-implib," + str(lib_path.joinpath("libsqlite3.dll.a")),
+				"-DSQLITE_THREADSAFE=1",
+				"-DSQLITE_ENABLE_MATH_FUNCTIONS",
+				"-DSQLITE_ENABLE_FTS4",
+				"-DSQLITE_ENABLE_FTS5",
+				"-DSQLITE_ENABLE_JSON1",
+				"-DSQLITE_ENABLE_RTREE",
+				"-DSQLITE_ENABLE_GEOPOLY",
+				"-o", str(bin_path.joinpath("sqlite3.dll")),
+				"sqlite3.c"
+			)
+
+			#---Copy header file---#
+			shutil.copyfile("sqlite3.h", str(include_path.joinpath("sqlite3.h")))
+
 class host_github_linux_t(host_clg_pandeb9_t):
 	def __del__(self):
 		"""The destructor."""
@@ -175,6 +229,7 @@ host_names	= {
 	"clg-pandeb9"	: host_clg_pandeb9_t,
 	"clg-macos"		: host_clg_macos_t,
 	"clg-freebsd64"	: host_clg_freebsd64_t,
+	"clg-junior"	: host_clg_junior_t,
 	"github-linux"	: host_github_linux_t,
 	"github-macos"	: host_github_macos_t,
 }
