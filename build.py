@@ -72,13 +72,13 @@ class host_clg_pandeb9_t(host_t):
 				"LIBS=-lm",
 			],
 			[
-				"i686-mingw",
+				"i686-mingw32",
 				"--host=i686-w64-mingw32",
 				"CC=i686-w64-mingw32-gcc -static-libgcc",
 				"CFLAGS=-Wall -Werror",
 			],
 			[
-				"x86_64-mingw",
+				"x86_64-mingw32",
 				"--host=x86_64-w64-mingw32",
 				"CC=x86_64-w64-mingw32-gcc",
 				"CFLAGS=-Wall -Werror",
@@ -162,7 +162,7 @@ class host_clg_junior_t(host_t):
 		# see https://sqlite.org/howtocompile.html
 		configure_arg_arr	= [
 			[
-				"i686-mingw",
+				"i686-mingw32",
 				str(pathlib.Path(os.environ["MINGW_HOME32"], "bin", "gcc.exe")),
 			],
 		]
